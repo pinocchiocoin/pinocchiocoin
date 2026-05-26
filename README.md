@@ -1,8 +1,26 @@
-# Pinocchio (PNH)
+# Pinocchio Ecosystem
 
-A CPU mineable Scrypt cryptocurrency. Mine with your computer. Fair launch. No ICO. No presale.
+## PINO Token — Base Chain ERC-20
 
-## Specifications
+| | |
+|---|---|
+| **Token Name** | Pinocchio |
+| **Ticker** | PINO |
+| **Network** | Base (Ethereum L2) |
+| **Type** | ERC-20 Token |
+| **Contract** | 0x579da34BE72f48328eB5efD1B311e5D3cD1B7129 |
+| **Total Supply** | 1,000,000,000 PINO |
+| **DEX** | Uniswap V2 on Base |
+
+Buy PINO: https://app.uniswap.org/swap?outputCurrency=0x579da34BE72f48328eB5efD1B311e5D3cD1B7129&chain=base
+
+Explorer: https://basescan.org/token/0x579da34BE72f48328eB5efD1B311e5D3cD1B7129
+
+---
+
+## PNH Coin — Mineable Blockchain Coin
+
+A CPU mineable Scrypt cryptocurrency. Fair launch. No ICO. No presale.
 
 | | |
 |---|---|
@@ -17,34 +35,36 @@ A CPU mineable Scrypt cryptocurrency. Mine with your computer. Fair launch. No I
 | **RPC Port** | 9778 |
 | **Based On** | Litecoin 0.18.1 |
 
-## Network
-
-Seed nodes will be published at launch.
-
-Website: http://planetpinocchio.com
-
-## Mining
+### Mining
 
 Mine using cpuminer with Scrypt algorithm:
 
-./minerd -a scrypt -o ... -u user -p pass --coinbase-addr=YOUR_PNH_ADDRESS -t 4
+```
+./minerd -a scrypt -o http://127.0.0.1:9778 -u user -p pass --coinbase-addr=YOUR_PNH_ADDRESS -t 4
+```
 
-## Ecosystem
+### Network
 
-PNH Coin — mineable blockchain coin (this repository)
+Seed nodes will be published at public launch.
 
-PINO Token — ERC-20 token on Base chain
-Contract: 0x579da34BE72f48328eB5efD1B311e5D3cD1B7129
-Buy on Uniswap: https://app.uniswap.org/swap?outputCurrency=0x579da34BE72f48328eB5efD1B311e5D3cD1B7129&chain=base
+---
 
-## Website
+## Planet Pinocchio Football Universe
 
-http://planetpinocchio.com
+Three tournaments established since 1983:
+- **Tea Cup** (est. 1983) — most prestigious trophy, Final every 31 May
+- **Universe League** (est. 1984) — full season competition
+- **Universe Cup** (est. 1984) — knockout tournament
 
-## Contact
+PINO token holders access full tournament history and live match viewing.
 
-info@planetpinocchio.com
+---
+
+## Links
+
+- Website: https://planetpinocchio.com
+- Twitter: https://x.com/PinocchioPNH
+- Contact: info@planetpinocchio.com
 
 ## License
-
 MIT
