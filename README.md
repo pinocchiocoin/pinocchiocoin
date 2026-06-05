@@ -40,12 +40,18 @@ A CPU mineable Scrypt cryptocurrency. Fair launch. No ICO. No presale.
 Mine using cpuminer with Scrypt algorithm:
 
 ```
-./minerd -a scrypt -o http://127.0.0.1:9778 -u user -p pass --coinbase-addr=YOUR_PNH_ADDRESS -t 4
+./minerd -a scrypt -o http://127.0.0.1:9778 -u user -p pass --coinbase-addr=YOUR_PNH_ADDRESS -t 4 --no-longpoll
 ```
 
 ### Network
 
-Seed nodes will be published at public launch.
+Connect to the PNH network using the seed node:
+
+```
+addnode=13.60.252.130:9777
+```
+
+Add this line to your `pinocchio.conf` file to connect to the network.
 
 ---
 
@@ -57,6 +63,7 @@ Three tournaments established since 1983:
 - **Universe Cup** (est. 1984) — knockout tournament
 
 PINO token holders access full tournament history and live match viewing.
+Early PNH miners receive PINO token airdrops at exchange launch.
 
 ---
 
