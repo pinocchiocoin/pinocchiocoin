@@ -35,6 +35,10 @@ A CPU mineable Scrypt cryptocurrency. Fair launch. No ICO. No presale.
 | **RPC Port** | 9778 |
 | **Based On** | Litecoin 0.18.1 |
 
+### Block Explorer
+
+http://13.60.252.130:3001
+
 ### Mining
 
 Mine using cpuminer with Scrypt algorithm:
@@ -70,6 +74,8 @@ Early PNH miners receive PINO token airdrops at exchange launch.
 ## Links
 
 - Website: https://planetpinocchio.com
+- Block Explorer: http://13.60.252.130:3001
+- Bitcointalk: https://bitcointalk.org/index.php?topic=5585138
 - Twitter: https://x.com/PinocchioPNH
 - Contact: info@planetpinocchio.com
 
