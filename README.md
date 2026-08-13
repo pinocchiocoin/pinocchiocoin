@@ -1,4 +1,4 @@
-# PNH — Pinocchio Coin
+# PNH - Pinocchio Coin
 
 A CPU-mineable Scrypt cryptocurrency forked from Litecoin 0.18.1.
 No ICO. No presale. 1.2% project allocation, disclosed below.
