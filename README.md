@@ -1,4 +1,4 @@
-# PNH - Pinocchio Coin
+# PNH — Pinocchio Coin
 
 A CPU-mineable Scrypt cryptocurrency forked from Litecoin 0.18.1.
 No ICO. No presale. 1.2% project allocation, disclosed below.
@@ -40,17 +40,24 @@ your balance before running for any length of time.
 
 ## Chain
 
-The PNH mainnet launched from genesis on 13 August 2026. An earlier test
-chain was discarded and does not carry over — no balances, addresses or
-blocks from it exist here.
+PNH mainnet launched from genesis on 13 August 2026.
 
-PNH is a fully independent chain: unique address and key prefixes, its own
+It is a fully independent chain: unique address and key prefixes, its own
 bech32 HRP, and P2SH and SegWit active from block 0.
 
 Difficulty uses DarkGravityWave, retargeting every block over a 24-block
 window with a 3× clamp, so difficulty tracks real hashrate. The chain does
 not stall when miners join or leave — a practical requirement for a
 CPU-mined coin with variable participation.
+
+Verify you are on the correct chain before mining:
+
+```bash
+./src/litecoin-cli -datadir=$HOME/.pinocchio getblockhash 0
+```
+
+This must return
+`f1bd5b30b65b5334c29b1551dbeebc8549459e441bba6f69a1f4bc8629dbca73`.
 
 ---
 
@@ -137,16 +144,6 @@ Give it a moment to sync from the seed node:
 ./src/litecoin-cli -datadir=$HOME/.pinocchio getblockcount
 ./src/litecoin-cli -datadir=$HOME/.pinocchio getconnectioncount
 ```
-
-Verify you are on the right chain:
-
-```bash
-./src/litecoin-cli -datadir=$HOME/.pinocchio getblockhash 0
-```
-
-This must return
-`f1bd5b30b65b5334c29b1551dbeebc8549459e441bba6f69a1f4bc8629dbca73`.
-If it does not, you are not on the PNH mainnet.
 
 ---
 
