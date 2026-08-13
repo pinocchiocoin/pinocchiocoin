@@ -124,11 +124,18 @@ port=9777
 txindex=1
 addresstype=legacy
 changetype=legacy
+fallbackfee=0.0001
 addnode=13.60.252.130:9777
 ```
 
 `addresstype=legacy` and `changetype=legacy` are required. Without them the
 wallet generates P2SH addresses and your mining rewards will be lost.
+
+`fallbackfee` is required to send coins. The wallet normally estimates fees
+from recent network activity, but on a young chain there isn't enough
+history for that, and sends fail with "Fee estimation failed." This line
+supplies a default. If you change the config, restart the node — config is
+only read at startup.
 
 ---
 
