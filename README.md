@@ -1,80 +1,274 @@
-Litecoin Core integration/staging tree
-=====================================
+# PNH — Pinocchio Coin
 
-[![Build Status](https://travis-ci.org/litecoin-project/litecoin.svg?branch=master)](https://travis-ci.org/litecoin-project/litecoin)
+A CPU-mineable Scrypt cryptocurrency forked from Litecoin 0.18.1.
+No ICO. No presale. 1.2% project allocation, disclosed below.
+| | |
+|---|---|
+| Coin name | Pinocchio |
+| Ticker | PNH |
+| Algorithm | Scrypt |
+| Block reward | 50 PNH |
+| Block time | 2.5 minutes (150s) |
+| Halving | Every 840,000 blocks |
+| Max supply | 85,000,000 PNH |
+| Difficulty retarget | DarkGravityWave, every block |
+| P2P port | 9777 |
+| RPC port | 9779 |
+| Address prefix | `P` (legacy P2PKH) |
+| Based on | Litecoin 0.18.1 |
 
-https://litecoin.org
+**Genesis block:** `f1bd5b30b65b5334c29b1551dbeebc8549459e441bba6f69a1f4bc8629dbca73`
 
-What is Litecoin?
-----------------
+Block explorer: https://planetpinocchio.com/explorer.html
 
-Litecoin is an experimental digital currency that enables instant payments to
-anyone, anywhere in the world. Litecoin uses peer-to-peer technology to operate
-with no central authority: managing transactions and issuing money are carried
-out collectively by the network. Litecoin Core is the name of open source
-software which enables the use of this currency.
+---
 
-For more information, as well as an immediately useable, binary version of
-the Litecoin Core software, see [https://litecoin.org](https://litecoin.org).
+## ⚠ Read this before you mine
 
-License
--------
+**Your mining address must begin with `P`.**
 
-Litecoin Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
-information or see https://opensource.org/licenses/MIT.
+`cpuminer --coinbase-addr` builds P2PKH outputs only. If you give it a P2SH
+address (beginning with `Q`) or a bech32 address (`pnh1...`), the miner will
+accept it, blocks will be found, and **every reward will be permanently
+unspendable by anyone, including you.**
 
-Development Process
--------------------
+Set `addresstype=legacy` in your config, generate your address, and confirm
+it starts with `P` before you mine anything. Then mine one block and check
+your balance before running for any length of time.
 
-The `master` branch is regularly built and tested, but is not guaranteed to be
-completely stable. [Tags](https://github.com/litecoin-project/litecoin/tags) are created
-regularly to indicate new official, stable release versions of Litecoin Core.
+---
 
-The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md)
-and useful hints for developers can be found in [doc/developer-notes.md](doc/developer-notes.md).
+## Chain
 
-The developer [mailing list](https://groups.google.com/forum/#!forum/litecoin-dev)
-should be used to discuss complicated or controversial changes before working
-on a patch set.
+PNH mainnet launched from genesis on 13 August 2026.
 
-Developer IRC can be found on Freenode at #litecoin-dev.
+It is a fully independent chain: unique address and key prefixes, its own
+bech32 HRP, and P2SH and SegWit active from block 0.
 
-Testing
--------
+Difficulty uses DarkGravityWave, retargeting every block over a 24-block
+window with a 3× clamp, so difficulty tracks real hashrate. The chain does
+not stall when miners join or leave — a practical requirement for a
+CPU-mined coin with variable participation.
 
-Testing and code review is the bottleneck for development; we get more pull
-requests than we can review and test on short notice. Please be patient and help out by testing
-other people's pull requests, and remember this is a security-critical project where any mistake might cost people
-lots of money.
+Verify you are on the correct chain before mining:
 
-### Automated Testing
+```bash
+./src/litecoin-cli -datadir=$HOME/.pinocchio getblockhash 0
+```
 
-Developers are strongly encouraged to write [unit tests](src/test/README.md) for new code, and to
-submit new unit tests for old code. Unit tests can be compiled and run
-(assuming they weren't disabled in configure) with: `make check`. Further details on running
-and extending unit tests can be found in [/src/test/README.md](/src/test/README.md).
+This must return
+`f1bd5b30b65b5334c29b1551dbeebc8549459e441bba6f69a1f4bc8629dbca73`.
 
-There are also [regression and integration tests](/test), written
-in Python, that are run automatically on the build server.
-These tests can be run (if the [test dependencies](/test) are installed) with: `test/functional/test_runner.py`
+---
 
-The Travis CI system makes sure that every pull request is built for Windows, Linux, and macOS, and that unit/sanity tests are run automatically.
+## Project allocation
 
-### Manual Quality Assurance (QA) Testing
+Block 1 pays **1,000,000 PNH** (1.2% of max supply) to:
 
-Changes should be tested by somebody other than the developer who wrote the
-code. This is especially important for large or high-risk changes. It is useful
-to add a test plan to the pull request description if testing the changes is
-not straightforward.
+```
+PVZnbusbn3c5hyaVifn3whc3gxrSedLJjv
+```
 
-Translations
-------------
+Blocks 2 onward pay 50 PNH on the standard schedule.
 
-We only accept translation fixes that are submitted through [Bitcoin Core's Transifex page](https://www.transifex.com/projects/p/bitcoin/).
-Translations are converted to Litecoin periodically.
+The allocation funds OTC purchases from miners, airdrops, and exchange
+liquidity. It is implemented in `GetBlockSubsidy` (`src/validation.cpp`)
+and is verifiable on the block explorer.
 
-Translations are periodically pulled from Transifex and merged into the git repository. See the
-[translation process](doc/translation_process.md) for details on how this works.
+It is in block 1 rather than the genesis block because the genesis coinbase
+is never added to the UTXO set and would be permanently unspendable — the
+same reason Satoshi's genesis 50 BTC has never moved.
 
-**Important**: We do not accept translation changes as GitHub pull requests because the next
-pull from Transifex would automatically overwrite them again.
+---
+
+## Building the node
+
+You need a node to create an address and see your balance.
+
+```bash
+sudo apt install -y build-essential libtool autotools-dev automake \
+  pkg-config libssl-dev libevent-dev bsdmainutils libboost-all-dev \
+  libdb-dev libdb++-dev
+
+git clone https://github.com/pinocchiocoin/pinocchiocoin
+cd pinocchiocoin
+./autogen.sh
+./configure --with-incompatible-bdb
+make
+```
+
+**Build note for Ubuntu 25.10+ / GCC 15:** if the build fails with
+`std::array ... has initializer but incomplete type`, the toolchain has
+dropped a transitive include. Add `#include <array>` to the offending file,
+or build with an older compiler:
+
+```bash
+sudo apt install g++-12 gcc-12
+./configure CXX=g++-12 CC=gcc-12 --with-incompatible-bdb
+```
+
+---
+
+## Configuration
+
+Create `~/.pinocchio/pinocchio.conf`:
+
+```ini
+rpcuser=YOUR_USERNAME
+rpcpassword=YOUR_STRONG_PASSWORD
+rpcport=9779
+daemon=1
+server=1
+listen=1
+port=9777
+txindex=1
+addresstype=legacy
+changetype=legacy
+fallbackfee=0.0001
+addnode=13.60.252.130:9777
+```
+
+`addresstype=legacy` and `changetype=legacy` are required. Without them the
+wallet generates P2SH addresses and your mining rewards will be lost.
+
+`fallbackfee` is required to send coins. The wallet normally estimates fees
+from recent network activity, but on a young chain there isn't enough
+history for that, and sends fail with "Fee estimation failed." This line
+supplies a default. If you change the config, restart the node — config is
+only read at startup.
+
+---
+
+## Running
+
+```bash
+./src/litecoind -datadir=$HOME/.pinocchio
+```
+
+Give it a moment to sync from the seed node:
+
+```bash
+./src/litecoin-cli -datadir=$HOME/.pinocchio getblockcount
+./src/litecoin-cli -datadir=$HOME/.pinocchio getconnectioncount
+```
+
+---
+
+## Creating your mining address
+
+```bash
+./src/litecoin-cli -datadir=$HOME/.pinocchio getnewaddress "mining"
+```
+
+Confirm the type:
+
+```bash
+./src/litecoin-cli -datadir=$HOME/.pinocchio getaddressinfo YOUR_ADDRESS
+```
+
+You need `"isscript": false` and `"ismine": true`, and the address must
+start with `P`. If `isscript` is true, `addresstype=legacy` is missing from
+your config — fix it, restart the node, and generate another address. Do
+not mine to the old one.
+
+---
+
+## Building cpuminer
+
+```bash
+sudo apt install -y build-essential libssl-dev \
+  libcurl4-openssl-dev libjansson-dev automake
+
+git clone https://github.com/pooler/cpuminer
+cd cpuminer && ./autogen.sh && ./configure CFLAGS="-O3" && make
+```
+
+---
+
+## Mining
+
+```bash
+./minerd -a scrypt \
+  -o http://13.60.252.130:9779 \
+  -u admin -p pnh_seed_2026 \
+  --coinbase-addr=YOUR_P_ADDRESS -t 4
+```
+
+Use one fewer thread than you have cores so your node stays responsive.
+
+### Verify before running longer
+
+After your first `accepted: 1/1`, stop the miner and check:
+
+```bash
+./src/litecoin-cli -datadir=$HOME/.pinocchio getwalletinfo
+```
+
+`immature_balance` must show `50.00000000`.
+
+If it shows `0.00000000`, stop — your address is the wrong type and that
+reward is gone. Return to the configuration step.
+
+Rewards mature after 100 confirmations before they can be spent.
+
+---
+
+## Back up your wallet
+
+```bash
+cp ~/.pinocchio/wallet.dat ~/wallet_backup.dat
+```
+
+This file is the only copy of your keys. Lose it and you lose your coins.
+
+---
+
+## Network
+
+Seed node:
+
+```
+addnode=13.60.252.130:9777
+```
+
+**WSL2:** mining to the seed node works from WSL2 (outbound only). A node
+under WSL2 cannot accept inbound peers, so use native Linux or a VPS if you
+want to run a fully connected node.
+
+---
+
+## Selling mined PNH
+
+PNH is not yet listed on an exchange. Applications are pending.
+
+In the meantime the project will buy mined PNH directly for BTC or ETH.
+Email info@planetpinocchio.com with the amount and your receiving address.
+There is no established market price yet, so the rate is negotiable — early
+trading is what will establish one.
+
+---
+
+## Related tokens
+
+PINO and wPNH are ERC-20 tokens on Base. They are separate assets. Neither
+is mined, and neither is convertible to or from PNH coin. wPNH is not
+backed by, and carries no claim on, PNH coin despite its name.
+
+See https://planetpinocchio.com for details.
+
+---
+
+## Links
+
+- Website: https://planetpinocchio.com
+- Block explorer: https://planetpinocchio.com/explorer.html
+- Bitcointalk: https://bitcointalk.org/index.php?topic=5585138
+- X: https://x.com/PinocchioPNH
+- Contact: info@planetpinocchio.com
+
+## License
+
+MIT. See [COPYING](COPYING).
+
+Forked from Litecoin Core, which is forked from Bitcoin Core. Copyright
+notices of both are retained.
