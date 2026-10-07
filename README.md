@@ -1,91 +1,129 @@
-# PNH - Pinocchio Coin
+# Pinocchio (PNH)
 
-A CPU-mineable Scrypt cryptocurrency forked from Litecoin 0.18.1.
-No ICO. No presale. 1.2% project allocation, disclosed below.
+A CPU mineable Scrypt cryptocurrency with its own blockchain, forked from
+Litecoin 0.18.1. No ICO, no presale, 1.2% project allocation disclosed below.
+
+PNH is the coin behind the Planet Pinocchio Football Universe, a fictional
+football world running since 1983. Every result in the Universe League pays
+PNH into the winning club's wallet, on-chain and publicly verifiable.
+
 | | |
 |---|---|
 | Coin name | Pinocchio |
 | Ticker | PNH |
 | Algorithm | Scrypt |
 | Block reward | 50 PNH |
-| Block time | 2.5 minutes (150s) |
+| Block time | 2.5 minutes |
 | Halving | Every 840,000 blocks |
 | Max supply | 85,000,000 PNH |
 | Difficulty retarget | DarkGravityWave, every block |
+| Address prefix | `P` (legacy P2PKH) |
 | P2P port | 9777 |
 | RPC port | 9779 |
-| Address prefix | `P` (legacy P2PKH) |
 | Based on | Litecoin 0.18.1 |
 
-**Genesis block:** `f1bd5b30b65b5334c29b1551dbeebc8549459e441bba6f69a1f4bc8629dbca73`
+**Genesis:** `f1bd5b30b65b5334c29b1551dbeebc8549459e441bba6f69a1f4bc8629dbca73`
 
-Block explorer: https://planetpinocchio.com/explorer.html
-
----
-
-## ⚠ Read this before you mine
-
-**Your mining address must begin with `P`.**
-
-`cpuminer --coinbase-addr` builds P2PKH outputs only. If you give it a P2SH
-address (beginning with `Q`) or a bech32 address (`pnh1...`), the miner will
-accept it, blocks will be found, and **every reward will be permanently
-unspendable by anyone, including you.**
-
-Set `addresstype=legacy` in your config, generate your address, and confirm
-it starts with `P` before you mine anything. Then mine one block and check
-your balance before running for any length of time.
+- Block explorer: https://planetpinocchio.com/explorer.html
+- Live results and club prize fund: https://planetpinocchio.com/league.html
+- Website: https://planetpinocchio.com
 
 ---
 
-## Chain
+## Get an address without building anything
 
-PNH mainnet launched from genesis on 13 August 2026.
+The quickest way to hold PNH is the browser address generator:
 
-It is a fully independent chain: unique address and key prefixes, its own
-bech32 HRP, and P2SH and SegWit active from block 0.
+**https://planetpinocchio.com/address.html**
 
-Difficulty uses DarkGravityWave, retargeting every block over a 24-block
-window with a 3× clamp, so difficulty tracks real hashrate. The chain does
-not stall when miners join or leave — a practical requirement for a
-CPU-mined coin with variable participation.
+It derives a keypair entirely client side. Nothing is sent to any server.
+You get a `P` address for receiving and a WIF private key to keep. That is
+enough to receive club prize money or mining rewards. To spend what you
+receive, import the key into the wallet below.
 
-Verify you are on the correct chain before mining:
+---
 
-```bash
-./src/litecoin-cli -datadir=$HOME/.pinocchio getblockhash 0
+## Club prize money
+
+Twelve clubs each hold a PNH address. Every competitive result pays into
+the winning club's wallet.
+
+| Result | Pays |
+|---|---|
+| League win | 600 PNH |
+| League draw | 200 PNH |
+| Per goal scored | 100 PNH |
+| Universe Cup round | x2 |
+| Universe Cup Final | x4 |
+| Tea Cup group or QF | x3 |
+| Tea Cup semi-final | x5 |
+| Tea Cup Final | x10 |
+
+Payments are made weekly in a single transaction. Running totals and the
+twelve club addresses are published at
+https://planetpinocchio.com/league.html and every payment can be checked
+on the block explorer.
+
+---
+
+## Mining
+
+Difficulty is low enough that a normal desktop CPU finds blocks in under a
+minute.
+
+### 1. Get an address
+
+Either use the [browser generator](https://planetpinocchio.com/address.html),
+or build the wallet below and run `getnewaddress`.
+
+Your address must begin with `P`. If you build the wallet, put
+`addresstype=legacy` in your config. Without it the node produces P2SH
+addresses beginning with `Q`, and cpuminer cannot build P2SH outputs, so
+rewards mined to a `Q` address are permanently unspendable.
+
+### 2. Build cpuminer
+
+```
+sudo apt install -y build-essential libssl-dev \
+  libcurl4-openssl-dev libjansson-dev automake
+
+git clone https://github.com/pooler/cpuminer
+cd cpuminer && ./autogen.sh && ./configure CFLAGS="-O3" && make
 ```
 
-This must return
-`f1bd5b30b65b5334c29b1551dbeebc8549459e441bba6f69a1f4bc8629dbca73`.
+### 3. Mine
+
+```
+./minerd -a scrypt \
+  -o http://13.60.252.130:9779 \
+  -u admin -p pnh_seed_2026 \
+  --coinbase-addr=YOUR_P_ADDRESS -t 4
+```
+
+No node needed. You mine directly against the seed node.
+
+### 4. Check it worked
+
+If you built the wallet:
+
+```
+./src/litecoin-cli -datadir=$HOME/.pinocchio getwalletinfo
+```
+
+`immature_balance` should show `50.00000000` after your first accepted
+block. Rewards mature after 100 confirmations.
+
+If you used the browser generator, look the address up on the
+[block explorer](https://planetpinocchio.com/explorer.html).
 
 ---
 
-## Project allocation
+## Building the wallet
 
-Block 1 pays **1,000,000 PNH** (1.2% of max supply) to:
+Needed if you want to spend coins, run a node, or generate addresses
+locally.
 
 ```
-PVZnbusbn3c5hyaVifn3whc3gxrSedLJjv
-```
-
-Blocks 2 onward pay 50 PNH on the standard schedule.
-
-The allocation funds OTC purchases from miners, airdrops, and exchange
-liquidity. It is implemented in `GetBlockSubsidy` (`src/validation.cpp`)
-and is verifiable on the block explorer.
-
-It is in block 1 rather than the genesis block because the genesis coinbase
-is never added to the UTXO set and would be permanently unspendable — the
-same reason Satoshi's genesis 50 BTC has never moved.
-
----
-
-## Building the node
-
-You need a node to create an address and see your balance.
-
-```bash
 sudo apt install -y build-essential libtool autotools-dev automake \
   pkg-config libssl-dev libevent-dev bsdmainutils libboost-all-dev \
   libdb-dev libdb++-dev
@@ -97,129 +135,38 @@ cd pinocchiocoin
 make
 ```
 
-**Build note for Ubuntu 25.10+ / GCC 15:** if the build fails with
-`std::array ... has initializer but incomplete type`, the toolchain has
-dropped a transitive include. Add `#include <array>` to the offending file,
-or build with an older compiler:
-
-```bash
-sudo apt install g++-12 gcc-12
-./configure CXX=g++-12 CC=gcc-12 --with-incompatible-bdb
-```
-
----
-
-## Configuration
-
 Create `~/.pinocchio/pinocchio.conf`:
 
-```ini
+```
 rpcuser=YOUR_USERNAME
 rpcpassword=YOUR_STRONG_PASSWORD
 rpcport=9779
+rpcbind=127.0.0.1
+rpcallowip=127.0.0.1
 daemon=1
 server=1
 listen=1
 port=9777
 txindex=1
 addresstype=legacy
-changetype=legacy
-fallbackfee=0.0001
 addnode=13.60.252.130:9777
 ```
 
-`addresstype=legacy` and `changetype=legacy` are required. Without them the
-wallet generates P2SH addresses and your mining rewards will be lost.
+Start it:
 
-`fallbackfee` is required to send coins. The wallet normally estimates fees
-from recent network activity, but on a young chain there isn't enough
-history for that, and sends fail with "Fee estimation failed." This line
-supplies a default. If you change the config, restart the node — config is
-only read at startup.
-
----
-
-## Running
-
-```bash
-./src/litecoind -datadir=$HOME/.pinocchio
 ```
-
-Give it a moment to sync from the seed node:
-
-```bash
+./src/litecoind -datadir=$HOME/.pinocchio -daemon
 ./src/litecoin-cli -datadir=$HOME/.pinocchio getblockcount
-./src/litecoin-cli -datadir=$HOME/.pinocchio getconnectioncount
-```
-
----
-
-## Creating your mining address
-
-```bash
 ./src/litecoin-cli -datadir=$HOME/.pinocchio getnewaddress "mining"
 ```
 
-Confirm the type:
+To import a key from the browser generator:
 
-```bash
-./src/litecoin-cli -datadir=$HOME/.pinocchio getaddressinfo YOUR_ADDRESS
+```
+./src/litecoin-cli -datadir=$HOME/.pinocchio importprivkey YOUR_WIF_KEY
 ```
 
-You need `"isscript": false` and `"ismine": true`, and the address must
-start with `P`. If `isscript` is true, `addresstype=legacy` is missing from
-your config — fix it, restart the node, and generate another address. Do
-not mine to the old one.
-
----
-
-## Building cpuminer
-
-```bash
-sudo apt install -y build-essential libssl-dev \
-  libcurl4-openssl-dev libjansson-dev automake
-
-git clone https://github.com/pooler/cpuminer
-cd cpuminer && ./autogen.sh && ./configure CFLAGS="-O3" && make
-```
-
----
-
-## Mining
-
-```bash
-./minerd -a scrypt \
-  -o http://13.60.252.130:9779 \
-  -u admin -p pnh_seed_2026 \
-  --coinbase-addr=YOUR_P_ADDRESS -t 4
-```
-
-Use one fewer thread than you have cores so your node stays responsive.
-
-### Verify before running longer
-
-After your first `accepted: 1/1`, stop the miner and check:
-
-```bash
-./src/litecoin-cli -datadir=$HOME/.pinocchio getwalletinfo
-```
-
-`immature_balance` must show `50.00000000`.
-
-If it shows `0.00000000`, stop — your address is the wrong type and that
-reward is gone. Return to the configuration step.
-
-Rewards mature after 100 confirmations before they can be spent.
-
----
-
-## Back up your wallet
-
-```bash
-cp ~/.pinocchio/wallet.dat ~/wallet_backup.dat
-```
-
-This file is the only copy of your keys. Lose it and you lose your coins.
+Back up `~/.pinocchio/wallet.dat`. It is the only copy of your keys.
 
 ---
 
@@ -231,44 +178,89 @@ Seed node:
 addnode=13.60.252.130:9777
 ```
 
-**WSL2:** mining to the seed node works from WSL2 (outbound only). A node
-under WSL2 cannot accept inbound peers, so use native Linux or a VPS if you
-want to run a fully connected node.
+**WSL2:** mining to the seed node works from WSL2, which only needs
+outbound connections. A full node under WSL2 cannot accept inbound peers.
+Use native Linux or a VPS to run a node.
+
+---
+
+## Project allocation
+
+Block 1 pays **1,000,000 PNH** (1.2% of max supply) to
+`PVZnbusbn3c5hyaVifn3whc3gxrSedLJjv`. Blocks 2 onward pay 50 PNH on the
+standard schedule.
+
+The allocation funds club prize money, OTC purchases from miners, and
+airdrops. It is visible on the block explorer and in `GetBlockSubsidy`
+in the source.
+
+---
+
+## Relaunch, August 2026
+
+The chain was rebuilt from a new genesis after a review found several
+parameters inherited unchanged from Litecoin that would have caused
+problems later:
+
+- `PUBKEY_ADDRESS` was 48, identical to Litecoin, so addresses were
+  indistinguishable between the two chains and cross-chain sends would
+  have been accepted and lost. Now 55.
+- `SCRIPT_ADDRESS2` and `SECRET_KEY` likewise changed, so PNH private
+  keys no longer import into Litecoin Core.
+- `bech32_hrp` was `ltc`, now `pnh`.
+- `vFixedSeeds` still carried Litecoin's peer list, so nodes could never
+  discover each other.
+- Difficulty used Litecoin's 2016-block retarget, which would have
+  frozen the chain if a miner joined and left. Replaced with
+  DarkGravityWave, retargeting every block.
+- BIP16 (P2SH) was unenforced until height 218,579.
+- CSV and SegWit had BIP9 windows that expired in 2018 and could never
+  have activated. Both are now active from height 0.
+- `nMinimumChainWork` and `defaultAssumeValid` were non-zero, leaving
+  `IsInitialBlockDownload()` permanently true so `getblocktemplate`
+  refused every mining request.
+- `MAX_MONEY` was 100,000,000 against an 84,000,000 issuance schedule.
+
+The original chain was stopped and archived. No PNH was held by anyone
+outside the project at the time.
 
 ---
 
 ## Selling mined PNH
 
-PNH is not yet listed on an exchange. Applications are pending.
+PNH is not listed on any exchange. Applications are pending and there is
+no market price.
 
-In the meantime the project will buy mined PNH directly for BTC or ETH.
-Email info@planetpinocchio.com with the amount and your receiving address.
-There is no established market price yet, so the rate is negotiable — early
-trading is what will establish one.
+In the meantime the project will buy mined PNH for BTC or ETH. Email
+**info@planetpinocchio.com** with the amount and your receiving address.
+The rate is negotiable because there is nothing to price against yet.
 
 ---
 
-## Related tokens
+## Other tokens
 
-PINO and wPNH are ERC-20 tokens on Base. They are separate assets. Neither
-is mined, and neither is convertible to or from PNH coin. wPNH is not
-backed by, and carries no claim on, PNH coin despite its name.
+Separate ERC-20 tokens on Base, not convertible to or from PNH coin:
 
-See https://planetpinocchio.com for details.
+| Token | Contract |
+|---|---|
+| PINO | 0x579da34BE72f48328eB5efD1B311e5D3cD1B7129 |
+| Winners Coin | 0x5C201703E40491ad5c7163266fe3A9D6631ab416 |
+| PP Planet Pinocchio | 0x79334c3E64D85173Bd875dc72843F2DF7387cd16 |
+| BP Bad Planet | 0x44B8AaD8F9424e78eaD423F4524Af52569281f78 |
+| FP Fort Province | 0x47DeB209ee8A1F62EA680d4C3Bf9B7189bf08840 |
 
 ---
 
 ## Links
 
-- Website: https://planetpinocchio.com
-- Block explorer: https://planetpinocchio.com/explorer.html
-- Bitcointalk: https://bitcointalk.org/index.php?topic=5585138
-- X: https://x.com/PinocchioPNH
-- Contact: info@planetpinocchio.com
+- https://planetpinocchio.com
+- https://planetpinocchio.com/explorer.html
+- https://planetpinocchio.com/league.html
+- https://planetpinocchio.com/address.html
+- https://bitcointalk.org/index.php?topic=5585138
+- https://x.com/PinocchioPNH
+- info@planetpinocchio.com
 
 ## License
 
-MIT. See [COPYING](COPYING).
-
-Forked from Litecoin Core, which is forked from Bitcoin Core. Copyright
-notices of both are retained.
+MIT
